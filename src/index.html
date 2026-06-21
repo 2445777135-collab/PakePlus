@@ -1,0 +1,2753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>法盾 · AI法律顾问系统</title>
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --primary: #1a3c6e;
+            --primary-light: #2556a0;
+            --accent: #c9a84c;
+            --accent-light: #f0d080;
+            --bg: #f5f7fa;
+            --bg-card: #ffffff;
+            --text-main: #1a1a2e;
+            --text-sub: #5a6a80;
+            --text-light: #8899aa;
+            --border: #dde3ec;
+            --success: #2e8b57;
+            --warning: #e07b00;
+            --danger: #c0392b;
+            --info: #2980b9;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 2px 16px rgba(26, 60, 110, 0.10);
+            --shadow-lg: 0 8px 40px rgba(26, 60, 110, 0.15);
+        }
+
+        /* ===== Reset & Base ===== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f0f2f5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c0cce0;
+            border-radius: 3px;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #0d2a55 100%);
+            color: #fff;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.25);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .logo-sub {
+            font-size: 10px;
+            opacity: 0.7;
+            letter-spacing: 2px;
+        }
+
+        /* ===== Mobile Menu Toggle ===== */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* ===== Nav ===== */
+        .nav {
+            display: flex;
+            gap: 2px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.80);
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+        .nav-btn.active {
+            font-weight: 600;
+        }
+
+        /* ===== Main Layout ===== */
+        .main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        /* ===== Hero ===== */
+        .hero {
+            background: linear-gradient(120deg, var(--primary) 0%, var(--primary-light) 60%, #3a7bd5 100%);
+            border-radius: 20px;
+            padding: 40px 44px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+        .hero::after {
+            content: '⚖️';
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 100px;
+            opacity: 0.10;
+        }
+        .hero-left {
+            max-width: 500px;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-title {
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 10px;
+        }
+        .hero-title span {
+            color: var(--accent-light);
+        }
+        .hero-sub {
+            font-size: 15px;
+            opacity: 0.85;
+            margin-bottom: 22px;
+            line-height: 1.8;
+        }
+        .hero-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .hero-tag {
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .hero-stats {
+            display: flex;
+            gap: 28px;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-num {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--accent-light);
+        }
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.75;
+        }
+
+        /* ===== Section Title ===== */
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ===== Feature Grid ===== */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 32px;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px 20px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+        .feature-card.active {
+            border-color: var(--primary);
+            background: #f0f5ff;
+        }
+        .fc-icon {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+        .fc-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .fc-desc {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.7;
+        }
+        .fc-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+
+        /* ===== Pages ===== */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+
+        /* ===== Q&A Page ===== */
+        .qa-container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 20px;
+        }
+        .qa-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .age-selector {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+        .age-selector h3 {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .age-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .age-btn {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+        .age-btn:hover {
+            border-color: var(--primary-light);
+            background: #eef3ff;
+        }
+        .age-btn.active {
+            border-color: var(--primary);
+            background: #1a3c6e;
+            color: #fff;
+            font-weight: 600;
+        }
+        .age-btn .age-label {
+            font-weight: 600;
+        }
+        .age-btn .age-law {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        .quick-qs {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+        .quick-qs h3 {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .qq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .qq-item {
+            background: #f0f5ff;
+            border: 1px solid #d0daf5;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--primary);
+            transition: all 0.2s;
+        }
+        .qq-item:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .chat-box {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            height: 580px;
+            overflow: hidden;
+        }
+        .chat-header {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            color: #fff;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .chat-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .chat-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .chat-status {
+            font-size: 11px;
+            opacity: 0.75;
+        }
+        .chat-status::before {
+            content: '●';
+            margin-right: 4px;
+            color: #4cdd7a;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .msg {
+            display: flex;
+            gap: 10px;
+            max-width: 88%;
+        }
+        .msg.user {
+            flex-direction: row-reverse;
+            align-self: flex-end;
+        }
+        .msg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .msg.ai .msg-avatar {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        }
+        .msg.user .msg-avatar {
+            background: var(--accent);
+        }
+        .msg-bubble {
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            line-height: 1.7;
+            word-break: break-word;
+        }
+        .msg.ai .msg-bubble {
+            background: #f0f5ff;
+            border: 1px solid #d0daf5;
+            border-top-left-radius: 4px;
+        }
+        .msg.user .msg-bubble {
+            background: var(--primary);
+            color: #fff;
+            border-top-right-radius: 4px;
+        }
+        .msg-bubble .law-tag {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+            font-size: 11px;
+            padding: 1px 8px;
+            border-radius: 10px;
+            margin: 4px 4px 0 0;
+        }
+        .msg-bubble .step {
+            background: rgba(26, 60, 110, 0.07);
+            border-left: 3px solid var(--accent);
+            padding: 6px 10px;
+            border-radius: 0 8px 8px 0;
+            margin: 6px 0;
+            font-size: 13px;
+        }
+        .msg-bubble ul {
+            padding-left: 18px;
+            margin-top: 4px;
+        }
+        .msg-bubble li {
+            margin-bottom: 2px;
+        }
+        .msg-bubble .btn-copy {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 14px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: 0.2s;
+        }
+        .msg-bubble .btn-copy:hover {
+            background: var(--primary-light);
+        }
+
+        .chat-input-area {
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+        .chat-input {
+            flex: 1;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 14px;
+            font-size: 14px;
+            resize: none;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            min-height: 42px;
+            max-height: 100px;
+        }
+        .chat-input:focus {
+            border-color: var(--primary-light);
+        }
+        .send-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .send-btn:hover {
+            background: var(--primary-light);
+        }
+        .send-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* ===== Risk Page ===== */
+        .risk-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .risk-quiz {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+        .risk-result {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+        .quiz-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+        .quiz-age-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .quiz-age-tab {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quiz-age-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .quiz-progress {
+            background: var(--border);
+            border-radius: 4px;
+            height: 6px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .quiz-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 4px;
+            transition: width 0.4s;
+        }
+        .quiz-question {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: var(--text-main);
+        }
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .quiz-option {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover {
+            border-color: var(--primary-light);
+            background: #eef3ff;
+        }
+        .quiz-option.selected {
+            border-color: var(--primary);
+            background: #e8efff;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 18px;
+        }
+        .btn {
+            padding: 8px 20px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-accent {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-accent:hover {
+            background: #b8903a;
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #1f6e43;
+        }
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        .score-circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            border: 8px solid;
+        }
+        .score-num {
+            font-size: 32px;
+        }
+        .score-label {
+            font-size: 11px;
+        }
+        .score-low {
+            border-color: var(--success);
+            color: var(--success);
+            background: #d4edda;
+        }
+        .score-mid {
+            border-color: var(--warning);
+            color: var(--warning);
+            background: #fff3cd;
+        }
+        .score-high {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: #ffe0e0;
+        }
+        .risk-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .risk-item {
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .ri-low {
+            background: #d4edda;
+            border: 1px solid #b8dacc;
+        }
+        .ri-mid {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+        }
+        .ri-high {
+            background: #ffe0e0;
+            border: 1px solid #f5c6cb;
+        }
+        .ri-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .ri-content h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .ri-content p {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        .risk-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== Documents Page ===== */
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .doc-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+        .doc-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+        .doc-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+        .doc-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        .doc-desc {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+        .doc-editor {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+        .doc-editor-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+        .form-input {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus {
+            border-color: var(--primary-light);
+        }
+        .form-input.error {
+            border-color: var(--danger);
+            background: #fff5f5;
+        }
+        .form-error {
+            color: var(--danger);
+            font-size: 12px;
+            min-height: 18px;
+        }
+        .doc-preview {
+            background: #f9fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            margin-top: 16px;
+            font-size: 14px;
+            line-height: 2;
+            white-space: pre-wrap;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            position: relative;
+        }
+        .doc-preview .copy-btn {
+            position: sticky;
+            bottom: 0;
+            float: right;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 4px 16px;
+            border-radius: 14px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .doc-preview .copy-btn:hover {
+            background: var(--primary-light);
+        }
+
+        /* ===== Cases Page ===== */
+        .case-filter {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .case-filter-btn {
+            padding: 5px 16px;
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .case-filter-btn.active,
+        .case-filter-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .case-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .case-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 5px solid var(--primary);
+        }
+        .case-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateX(4px);
+        }
+        .case-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .case-tag {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 10px;
+            background: #e8efff;
+            color: var(--primary);
+            border: 1px solid #c0d0f0;
+        }
+        .case-tag.labor {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-color: #a5d6a7;
+        }
+        .case-tag.family {
+            background: #fce4ec;
+            color: #c62828;
+            border-color: #ef9a9a;
+        }
+        .case-tag.consumer {
+            background: #fff3e0;
+            color: #e65100;
+            border-color: #ffcc80;
+        }
+        .case-tag.property {
+            background: #ede7f6;
+            color: #4527a0;
+            border-color: #b39ddb;
+        }
+        .case-tag.senior {
+            background: #f3e5f5;
+            color: #6a1b9a;
+            border-color: #ce93d8;
+        }
+        .case-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+        .case-summary {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+        .case-result {
+            background: #f0f8f0;
+            border: 1px solid #b8dacc;
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 13px;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* ===== Calculator Page ===== */
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+        .calc-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .calc-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .calc-field {
+            margin-bottom: 12px;
+        }
+        .calc-field label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .calc-input {
+            width: 100%;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .calc-input:focus {
+            border-color: var(--primary-light);
+        }
+        .calc-result {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            margin-top: 14px;
+            text-align: center;
+        }
+        .calc-result-num {
+            font-size: 24px;
+            font-weight: 800;
+        }
+        .calc-result-label {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        /* ===== Knowledge Page ===== */
+        .know-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .know-category {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .know-cat-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border);
+        }
+        .know-item {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .know-item:last-child {
+            border-bottom: none;
+        }
+        .know-item:hover .know-item-title {
+            color: var(--primary-light);
+        }
+        .know-item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+        .know-item-desc {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        /* ===== Search ===== */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            flex: 1;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .search-box input:focus {
+            border-color: var(--primary-light);
+        }
+        .search-box .btn {
+            flex-shrink: 0;
+        }
+
+        /* ===== Modal ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .modal-close {
+            background: var(--border);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .modal-close:hover {
+            background: #ccc;
+        }
+        .modal-body {
+            font-size: 14px;
+            line-height: 1.9;
+            color: var(--text-main);
+        }
+        .modal-body h4 {
+            font-size: 15px;
+            color: var(--primary);
+            margin: 14px 0 6px;
+        }
+        .modal-body .law-ref {
+            background: #f0f5ff;
+            border: 1px solid #c0d0f0;
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            margin: 6px 0;
+            font-size: 13px;
+        }
+        .modal-body ul {
+            padding-left: 18px;
+        }
+
+        /* ===== Typing ===== */
+        .typing {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 0;
+        }
+        .typing span {
+            width: 8px;
+            height: 8px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            animation: typing 1.2s infinite;
+        }
+        .typing span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes typing {
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            z-index: 3000;
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* ===== Disclaimer ===== */
+        .disclaimer {
+            background: linear-gradient(135deg, #1a3c6e 0%, #0d2a55 100%);
+            color: rgba(255, 255, 255, 0.75);
+            text-align: center;
+            padding: 20px 30px;
+            font-size: 13px;
+            line-height: 1.8;
+            margin-top: 40px;
+        }
+        .disclaimer strong {
+            color: var(--accent-light);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 1024px) {
+            .feature-grid,
+            .doc-grid,
+            .calc-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .qa-container,
+            .risk-container {
+                grid-template-columns: 1fr;
+            }
+            .know-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 16px;
+                height: 56px;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .nav {
+                display: none;
+                flex-direction: column;
+                background: var(--primary);
+                position: absolute;
+                top: 56px;
+                left: 0;
+                right: 0;
+                padding: 12px 16px;
+                gap: 4px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .nav.open {
+                display: flex;
+            }
+            .nav-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+                text-align: left;
+            }
+            .hero {
+                padding: 28px 20px;
+                flex-direction: column;
+                gap: 20px;
+            }
+            .hero::after {
+                display: none;
+            }
+            .hero-stats {
+                gap: 20px;
+                width: 100%;
+                justify-content: space-around;
+            }
+            .stat-num {
+                font-size: 24px;
+            }
+            .feature-grid,
+            .doc-grid,
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+            .main {
+                padding: 16px 12px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .chat-box {
+                height: 480px;
+            }
+            .risk-container {
+                grid-template-columns: 1fr;
+            }
+            .doc-editor {
+                padding: 16px;
+            }
+            .modal {
+                padding: 20px;
+            }
+            .hero-title {
+                font-size: 22px;
+            }
+        }
+        @media (max-width: 480px) {
+            .logo-text {
+                font-size: 15px;
+            }
+            .logo-sub {
+                font-size: 9px;
+            }
+            .hero-title {
+                font-size: 20px;
+            }
+            .hero-sub {
+                font-size: 14px;
+            }
+            .chat-box {
+                height: 400px;
+            }
+            .msg {
+                max-width: 95%;
+            }
+            .score-circle {
+                width: 90px;
+                height: 90px;
+            }
+            .score-num {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="logo" onclick="switchPage('home')">
+            <div class="logo-icon">⚖️</div>
+            <div>
+                <div class="logo-text">法盾</div>
+                <div class="logo-sub">AI LEGAL ADVISOR</div>
+            </div>
+        </div>
+        <button class="menu-toggle" id="menuToggle" aria-label="菜单">☰</button>
+        <nav class="nav" id="mainNav">
+            <button class="nav-btn active" onclick="switchPage('home')">首页</button>
+            <button class="nav-btn" onclick="switchPage('qa')">智能问答</button>
+            <button class="nav-btn" onclick="switchPage('risk')">风险自查</button>
+            <button class="nav-btn" onclick="switchPage('docs')">文书生成</button>
+            <button class="nav-btn" onclick="switchPage('cases')">案例学习</button>
+            <button class="nav-btn" onclick="switchPage('calc')">法律计算器</button>
+            <button class="nav-btn" onclick="switchPage('knowledge')">法律知识</button>
+        </nav>
+    </header>
+
+    <!-- ===== MAIN ===== -->
+    <div class="main">
+
+        <!-- ===== HOME ===== -->
+        <div class="page active" id="page-home">
+            <div class="hero">
+                <div class="hero-left">
+                    <div class="hero-title">全年龄段 <span>AI法律顾问</span><br />随时守护您的合法权益</div>
+                    <div class="hero-sub">基于多法条交叉比对技术，覆盖《民法典》《劳动法》《消费者权益保护法》等30+核心法律，为青少年、职场人士、中老年提供精准法律解答</div>
+                    <div class="hero-tags">
+                        <span class="hero-tag">🔍 多法条交叉比对</span>
+                        <span class="hero-tag">👥 全年龄段适配</span>
+                        <span class="hero-tag">🛡️ 合规安全</span>
+                        <span class="hero-tag">⚡ 即时解答</span>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-num">30+</div>
+                        <div class="stat-label">核心法律覆盖</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-num">200+</div>
+                        <div class="stat-label">典型案例</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-num">7×24h</div>
+                        <div class="stat-label">在线服务</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">⭐ 核心功能</div>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="switchPage('qa')">
+                    <div class="fc-icon">🤖</div>
+                    <div class="fc-title">智能法律问答</div>
+                    <div class="fc-desc">输入法律问题，AI自动调取多条法律法规交叉比对，输出严谨解答与维权步骤。</div>
+                    <div class="fc-badge">★ 核心功能</div>
+                </div>
+                <div class="feature-card" onclick="switchPage('risk')">
+                    <div class="fc-icon">🔎</div>
+                    <div class="fc-title">法律风险自查</div>
+                    <div class="fc-desc">问卷式评测，识别法律风险，生成量化评分和专属报告，提供预防建议。</div>
+                    <div class="fc-badge">全年龄段题库</div>
+                </div>
+                <div class="feature-card" onclick="switchPage('docs')">
+                    <div class="fc-icon">📄</div>
+                    <div class="fc-title">文书模板生成</div>
+                    <div class="fc-desc">一键生成借条、劳动合同、离婚协议、起诉状等规范法律文书。</div>
+                    <div class="fc-badge">6类文书</div>
+                </div>
+                <div class="feature-card" onclick="switchPage('cases')">
+                    <div class="fc-icon">📚</div>
+                    <div class="fc-title">案例学习中心</div>
+                    <div class="fc-desc">精选劳动仲裁、婚姻家庭、消费维权等真实典型案例，以案说法。</div>
+                    <div class="fc-badge">8+精选案例</div>
+                </div>
+                <div class="feature-card" onclick="switchPage('calc')">
+                    <div class="fc-icon">🧮</div>
+                    <div class="fc-title">法律计算器</div>
+                    <div class="fc-desc">诉讼费、赔偿金、工伤补偿、逾期利息等法律费用快速估算。</div>
+                    <div class="fc-badge">6大计算器</div>
+                </div>
+                <div class="feature-card" onclick="switchPage('knowledge')">
+                    <div class="fc-icon">💡</div>
+                    <div class="fc-title">法律知识库</div>
+                    <div class="fc-desc">民法、劳动法、婚姻法、消费者保护法等核心法律知识系统整理。</div>
+                    <div class="fc-badge">20+知识条目</div>
+                </div>
+            </div>
+
+            <div class="section-title">👥 适用人群</div>
+            <div class="feature-grid">
+                <div class="feature-card" style="cursor:default;">
+                    <div class="fc-icon">🎒</div>
+                    <div class="fc-title">青少年（6-17岁）</div>
+                    <div class="fc-desc">校园霸凌、网络沉迷、隐私保护、未成年人消费纠纷</div>
+                </div>
+                <div class="feature-card" style="cursor:default;">
+                    <div class="fc-icon">🎓</div>
+                    <div class="fc-title">学生群体（18-22岁）</div>
+                    <div class="fc-desc">兼职纠纷、校园贷陷阱、学术维权、租房押金纠纷</div>
+                </div>
+                <div class="feature-card" style="cursor:default;">
+                    <div class="fc-icon">💼</div>
+                    <div class="fc-title">职场青年（23-40岁）</div>
+                    <div class="fc-desc">社保纠纷、违法辞退、加班维权、劳务薪资拖欠</div>
+                </div>
+                <div class="feature-card" style="cursor:default;">
+                    <div class="fc-icon">🏠</div>
+                    <div class="fc-title">中年家庭（41-60岁）</div>
+                    <div class="fc-desc">婚姻财产分割、子女抚养、邻里纠纷、消费维权</div>
+                </div>
+                <div class="feature-card" style="cursor:default;">
+                    <div class="fc-icon">👴</div>
+                    <div class="fc-title">老年群体（60岁以上）</div>
+                    <div class="fc-desc">养老诈骗、遗产继承、赡养纠纷、电信诈骗防范</div>
+                </div>
+                <div class="feature-card" style="cursor:default;">
+                    <div class="fc-icon">🏪</div>
+                    <div class="fc-title">个体工商户</div>
+                    <div class="fc-desc">合同纠纷、货款追讨、商标侵权、员工工伤赔偿</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Q&A ===== -->
+        <div class="page" id="page-qa">
+            <div class="section-title">🤖 AI智能法律问答</div>
+            <div class="qa-container">
+                <div class="qa-sidebar">
+                    <div class="age-selector">
+                        <h3>👤 我的年龄段</h3>
+                        <div class="age-btns">
+                            <div class="age-btn" onclick="selectAge('youth',this)">
+                                <div class="age-label">🎒 青少年（6-17岁）</div>
+                                <div class="age-law">未成年人保护法</div>
+                            </div>
+                            <div class="age-btn" onclick="selectAge('student',this)">
+                                <div class="age-label">🎓 大学生（18-22岁）</div>
+                                <div class="age-law">合同法·消费者保护法</div>
+                            </div>
+                            <div class="age-btn active" onclick="selectAge('worker',this)">
+                                <div class="age-label">💼 职场青年（23-40岁）</div>
+                                <div class="age-law">劳动法·劳动合同法</div>
+                            </div>
+                            <div class="age-btn" onclick="selectAge('family',this)">
+                                <div class="age-label">🏠 中年家庭（41-60岁）</div>
+                                <div class="age-law">民法典·婚姻法</div>
+                            </div>
+                            <div class="age-btn" onclick="selectAge('senior',this)">
+                                <div class="age-label">👴 老年群体（60岁+）</div>
+                                <div class="age-law">老年人权益保障法</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quick-qs" id="quick-questions">
+                        <h3>⚡ 热门问题</h3>
+                        <div class="qq-list"></div>
+                    </div>
+                </div>
+
+                <div class="chat-box">
+                    <div class="chat-header">
+                        <div class="chat-avatar">⚖️</div>
+                        <div>
+                            <div class="chat-name">法盾AI法律顾问</div>
+                            <div class="chat-status">在线 | 多法条交叉比对</div>
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chat-messages"></div>
+                    <div class="chat-input-area">
+                        <textarea class="chat-input" id="chat-input" placeholder="输入法律问题，Ctrl+Enter发送" rows="2" onkeydown="if(event.ctrlKey&&event.key==='Enter')sendMessage()"></textarea>
+                        <button class="send-btn" onclick="sendMessage()">发送</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RISK ===== -->
+        <div class="page" id="page-risk">
+            <div class="section-title">🔎 法律风险自查</div>
+            <div class="risk-container">
+                <div class="risk-quiz">
+                    <div class="quiz-title">📋 风险评估问卷</div>
+                    <div class="quiz-age-tabs">
+                        <div class="quiz-age-tab active" onclick="switchQuiz('worker',this)">职场场景</div>
+                        <div class="quiz-age-tab" onclick="switchQuiz('consumer',this)">消费场景</div>
+                        <div class="quiz-age-tab" onclick="switchQuiz('family',this)">家庭场景</div>
+                        <div class="quiz-age-tab" onclick="switchQuiz('rental',this)">租房场景</div>
+                    </div>
+                    <div class="quiz-progress">
+                        <div class="quiz-progress-bar" id="quiz-progress-bar" style="width:20%"></div>
+                    </div>
+                    <div id="quiz-num" style="font-size:13px;color:var(--text-light);margin-bottom:10px;">第 1 题 / 共 5 题</div>
+                    <div class="quiz-question" id="quiz-question"></div>
+                    <div class="quiz-options" id="quiz-options"></div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-outline" onclick="quizPrev()" id="quiz-prev-btn">上一题</button>
+                        <button class="btn btn-primary" onclick="quizNext()" id="quiz-next-btn">下一题</button>
+                    </div>
+                </div>
+                <div class="risk-result" id="risk-result-panel">
+                    <div style="text-align:center;color:var(--text-light);padding:60px 20px;">
+                        <div style="font-size:56px;margin-bottom:12px;">🔍</div>
+                        <div style="font-size:16px;font-weight:600;">完成问卷后</div>
+                        <div style="font-size:13px;margin-top:6px;">您的风险评估报告将在这里显示</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DOCS ===== -->
+        <div class="page" id="page-docs">
+            <div class="section-title">📄 法律文书生成</div>
+            <div class="doc-grid">
+                <div class="doc-card" onclick="openDocEditor('iou')">
+                    <div class="doc-icon">📋</div>
+                    <div class="doc-name">借条 / 欠条</div>
+                    <div class="doc-desc">个人借贷记录，明确金额、利率、还款期限</div>
+                </div>
+                <div class="doc-card" onclick="openDocEditor('labor')">
+                    <div class="doc-icon">💼</div>
+                    <div class="doc-name">劳动合同（简易版）</div>
+                    <div class="doc-desc">明确工资、工时、试用期等劳动权益</div>
+                </div>
+                <div class="doc-card" onclick="openDocEditor('rental')">
+                    <div class="doc-icon">🏠</div>
+                    <div class="doc-name">房屋租赁合同</div>
+                    <div class="doc-desc">规范租金、押金、维修责任等租房条款</div>
+                </div>
+                <div class="doc-card" onclick="openDocEditor('divorce')">
+                    <div class="doc-icon">📑</div>
+                    <div class="doc-name">离婚协议书</div>
+                    <div class="doc-desc">财产分割、子女抚养、债务分担协议</div>
+                </div>
+                <div class="doc-card" onclick="openDocEditor('complaint')">
+                    <div class="doc-icon">⚖️</div>
+                    <div class="doc-name">民事起诉状</div>
+                    <div class="doc-desc">向人民法院提起民事诉讼的格式化文书</div>
+                </div>
+                <div class="doc-card" onclick="openDocEditor('support')">
+                    <div class="doc-icon">❤️</div>
+                    <div class="doc-name">赡养协议书</div>
+                    <div class="doc-desc">子女赡养义务、赡养费用、居住安排协议</div>
+                </div>
+            </div>
+
+            <div class="doc-editor" id="doc-editor" style="display:none">
+                <div class="doc-editor-title" id="doc-editor-title">📋 文书编辑</div>
+                <div id="doc-form"></div>
+                <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="generateDoc()">生成文书</button>
+                    <button class="btn btn-outline" onclick="clearDocEditor()">关闭</button>
+                </div>
+                <div class="doc-preview" id="doc-preview" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- ===== CASES ===== -->
+        <div class="page" id="page-cases">
+            <div class="section-title">📚 典型案例学习</div>
+            <div class="search-box">
+                <input type="text" id="caseSearchInput" placeholder="搜索案例..." oninput="filterCasesBySearch()" />
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('caseSearchInput').value='';filterCasesBySearch()">清空</button>
+            </div>
+            <div class="case-filter">
+                <div class="case-filter-btn active" onclick="filterCases('all',this)">全部</div>
+                <div class="case-filter-btn" onclick="filterCases('labor',this)">劳动纠纷</div>
+                <div class="case-filter-btn" onclick="filterCases('family',this)">婚姻家庭</div>
+                <div class="case-filter-btn" onclick="filterCases('consumer',this)">消费维权</div>
+                <div class="case-filter-btn" onclick="filterCases('property',this)">房产纠纷</div>
+                <div class="case-filter-btn" onclick="filterCases('senior',this)">老年权益</div>
+            </div>
+            <div class="case-list" id="case-list"></div>
+        </div>
+
+        <!-- ===== CALC ===== -->
+        <div class="page" id="page-calc">
+            <div class="section-title">🧮 法律计算器</div>
+            <div class="calc-grid">
+                <!-- 诉讼费 -->
+                <div class="calc-card">
+                    <div class="calc-title">⚖️ 诉讼费</div>
+                    <div class="calc-field"><label>诉讼标的额（元）</label><input type="number" class="calc-input" id="lawsuit-amount" placeholder="50000" oninput="calcLawsuit()" /></div>
+                    <div class="calc-result" id="lawsuit-result"><div class="calc-result-num">—</div><div class="calc-result-label">应缴诉讼费（元）</div></div>
+                    <div style="font-size:11px;color:var(--text-light);margin-top:6px;">《诉讼费用交纳办法》</div>
+                </div>
+                <!-- 工伤 -->
+                <div class="calc-card">
+                    <div class="calc-title">🦺 工伤赔偿</div>
+                    <div class="calc-field"><label>月均工资（元）</label><input type="number" class="calc-input" id="injury-salary" placeholder="6000" oninput="calcInjury()" /></div>
+                    <div class="calc-field"><label>伤残等级（1-10）</label><input type="number" class="calc-input" id="injury-level" placeholder="7" min="1" max="10" oninput="calcInjury()" /></div>
+                    <div class="calc-result" id="injury-result"><div class="calc-result-num">—</div><div class="calc-result-label">一次性伤残补助金</div></div>
+                    <div style="font-size:11px;color:var(--text-light);margin-top:6px;">《工伤保险条例》第35-37条</div>
+                </div>
+                <!-- 辞退补偿 -->
+                <div class="calc-card">
+                    <div class="calc-title">💼 辞退补偿金</div>
+                    <div class="calc-field"><label>月均工资（元）</label><input type="number" class="calc-input" id="comp-salary" placeholder="8000" oninput="calcComp()" /></div>
+                    <div class="calc-field"><label>工作年限（年）</label><input type="number" class="calc-input" id="comp-years" placeholder="3" oninput="calcComp()" /></div>
+                    <div class="calc-field"><label>是否违法辞退</label><select class="calc-input" id="comp-illegal" onchange="calcComp()"><option value="0">合法解除（N）</option><option value="1">违法辞退（2N）</option></select></div>
+                    <div class="calc-result" id="comp-result"><div class="calc-result-num">—</div><div class="calc-result-label">经济补偿金（元）</div></div>
+                    <div style="font-size:11px;color:var(--text-light);margin-top:6px;">《劳动合同法》第46、47、87条</div>
+                </div>
+                <!-- 交通赔偿 -->
+                <div class="calc-card">
+                    <div class="calc-title">🚗 交通事故</div>
+                    <div class="calc-field"><label>医疗费用（元）</label><input type="number" class="calc-input" id="traffic-medical" placeholder="20000" oninput="calcTraffic()" /></div>
+                    <div class="calc-field"><label>住院天数</label><input type="number" class="calc-input" id="traffic-hospital" placeholder="10" oninput="calcTraffic()" /></div>
+                    <div class="calc-field"><label>误工天数</label><input type="number" class="calc-input" id="traffic-lost" placeholder="30" oninput="calcTraffic()" /></div>
+                    <div class="calc-result" id="traffic-result"><div class="calc-result-num">—</div><div class="calc-result-label">基础赔偿额（元）</div></div>
+                    <div style="font-size:11px;color:var(--text-light);margin-top:6px;">《民法典》侵权责任编</div>
+                </div>
+                <!-- 逾期利息 -->
+                <div class="calc-card">
+                    <div class="calc-title">💰 逾期利息</div>
+                    <div class="calc-field"><label>借款本金（元）</label><input type="number" class="calc-input" id="interest-principal" placeholder="10000" oninput="calcInterest()" /></div>
+                    <div class="calc-field"><label>年利率（%）</label><input type="number" class="calc-input" id="interest-rate" placeholder="15.4" oninput="calcInterest()" /></div>
+                    <div class="calc-field"><label>逾期天数</label><input type="number" class="calc-input" id="interest-days" placeholder="90" oninput="calcInterest()" /></div>
+                    <div class="calc-result" id="interest-result"><div class="calc-result-num">—</div><div class="calc-result-label">应付利息（元）</div></div>
+                    <div style="font-size:11px;color:var(--text-light);margin-top:6px;">最高法民间借贷司法解释</div>
+                </div>
+                <!-- 律师费 -->
+                <div class="calc-card">
+                    <div class="calc-title">👨‍⚖️ 律师费估算</div>
+                    <div class="calc-field"><label>案件类型</label><select class="calc-input" id="lawyer-type" onchange="calcLawyer()"><option value="labor">劳动争议</option><option value="divorce">离婚案件</option><option value="contract">合同纠纷</option><option value="traffic">交通事故</option><option value="criminal">刑事辩护</option></select></div>
+                    <div class="calc-field"><label>标的额（元，无标填0）</label><input type="number" class="calc-input" id="lawyer-amount" placeholder="50000" oninput="calcLawyer()" /></div>
+                    <div class="calc-result" id="lawyer-result"><div class="calc-result-num">—</div><div class="calc-result-label">律师费参考区间</div></div>
+                    <div style="font-size:11px;color:var(--text-light);margin-top:6px;">各地标准不同，仅供参考</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== KNOWLEDGE ===== -->
+        <div class="page" id="page-knowledge">
+            <div class="section-title">💡 法律知识库</div>
+            <div class="search-box">
+                <input type="text" id="knowledgeSearchInput" placeholder="搜索知识..." oninput="filterKnowledge()" />
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('knowledgeSearchInput').value='';filterKnowledge()">清空</button>
+            </div>
+            <div class="know-grid" id="knowledge-grid"></div>
+        </div>
+
+    </div><!-- /main -->
+
+    <!-- ===== DISCLAIMER ===== -->
+    <div class="disclaimer">
+        <strong>⚠️ 重要声明</strong>：本系统为AI法律知识科普工具，所有解答内容仅供参考，<strong>不构成正式法律意见</strong>。<br />
+        如遇复杂法律纠纷，请咨询持证律师。© 2026 法盾AI法律顾问系统
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title"></div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================================
+        //  1. 扩展知识库（覆盖更多场景）
+        // ============================================================
+        const legalKB = {
+            '被公司辞退|违法辞退|无故解除|违法解雇|辞退赔偿': {
+                title: '违法辞退 / 经济补偿',
+                answer: `<strong>一、合法解除（N个月经济补偿）</strong>
+                    <div class="step">适用：经济性裁员、合同期满不续签、协商解除</div>
+                    公式：N = 工作年限（每满1年1个月，不满6月按0.5月）
+                    <strong>二、违法辞退（2N赔偿金）</strong>
+                    <div class="step">适用：无正当理由辞退、辞退孕期/哺乳期女职工</div>
+                    赔偿金 = N × 2
+                    <strong>三、维权步骤</strong>
+                    <ul><li>保存证据：合同、工资条、聊天记录、辞退通知</li>
+                    <li>协商 → 劳动仲裁（时效1年）→ 法院诉讼</li></ul>
+                    <span class="law-tag">《劳动合同法》第46、47、87条</span>`
+            },
+            '试用期|试用期内辞退': {
+                title: '试用期法律保护',
+                answer: `<strong>《劳动合同法》第19-21条：</strong>
+                    <div class="step">时长：3个月以内合同→≤1个月；1-3年→≤2个月；3年以上→≤6个月</div>
+                    <strong>禁止行为：</strong>
+                    <ul><li>不签合同只约试用期（视为正式期）</li>
+                    <li>以"不符合录用条件"辞退但无书面标准</li></ul>
+                    <strong>工资：</strong>不得低于正式工资80%，且不低于最低工资标准
+                    <span class="law-tag">《劳动合同法》第19、20、21条</span>`
+            },
+            '加班费|加班工资|加班不给钱|加班费怎么算': {
+                title: '加班费计算规则',
+                answer: `<strong>《劳动法》第44条：</strong>
+                    <div class="step">工作日加班 → 150%</div>
+                    <div class="step">休息日加班（未补休）→ 200%</div>
+                    <div class="step">法定节假日 → 300%</div>
+                    <strong>公式：</strong>日工资=月工资÷21.75，小时工资=日工资÷8
+                    <ul><li>收集考勤记录、加班通知</li>
+                    <li>劳动仲裁时效：1年内</li></ul>
+                    <span class="law-tag">《劳动法》第44条</span>`
+            },
+            '五险一金|社保|不缴纳社保|社会保险': {
+                title: '五险一金缴纳规定',
+                answer: `<strong>用人单位必须依法缴纳五险一金</strong>
+                    <div class="step">五险：养老、医疗、失业、工伤、生育</div>
+                    <strong>不缴纳的后果：</strong>
+                    <ul><li>向人社局投诉，责令补缴+滞纳金</li>
+                    <li>员工可"被迫辞职"主张经济补偿N</li></ul>
+                    <span class="law-tag">《社会保险法》第58、63条</span>
+                    <span class="law-tag">《劳动合同法》第38条第3项</span>`
+            },
+            '离婚|财产分割|房子怎么分|离婚财产': {
+                title: '离婚财产分割',
+                answer: `<strong>《民法典》婚姻编：</strong>
+                    <strong>共同财产（平均分割）：</strong>
+                    <ul><li>婚后购买的房产、车辆</li>
+                    <li>婚后工资、奖金、经营收入</li></ul>
+                    <strong>个人财产（不分割）：</strong>
+                    <ul><li>婚前个人财产</li>
+                    <li>父母出资购房明确赠与一方</li></ul>
+                    <div class="step">维权：协议离婚→调解→诉讼</div>
+                    <span class="law-tag">《民法典》第1062、1063、1087条</span>`
+            },
+            '遗产|继承|遗嘱|怎么继承': {
+                title: '遗产继承规则',
+                answer: `<strong>法定继承顺序：</strong>
+                    <div class="step">第一顺序：配偶、子女、父母</div>
+                    <div class="step">第二顺序：兄弟姐妹、祖父母、外祖父母</div>
+                    <strong>遗嘱形式：</strong>自书、公证、打印（2见证人）
+                    <div class="step">遗嘱不得剥夺缺乏劳动能力继承人的必留份</div>
+                    <span class="law-tag">《民法典》第1127、1134-1144条</span>`
+            },
+            '网购|七天无理由|退款|假货|消费维权|三倍赔偿': {
+                title: '消费者权益保护',
+                answer: `<strong>七天无理由退货（网购）：</strong>
+                    <div class="step">下单后7天内可退货（生鲜、定制品除外）</div>
+                    <strong>假货三倍赔偿（《消法》第55条）：</strong>
+                    <div class="step">欺诈→退一赔三，最低500元</div>
+                    <strong>维权渠道：</strong>
+                    <ul><li>与商家协商</li><li>平台投诉</li>
+                    <li>12315投诉</li><li>法院诉讼</li></ul>
+                    <span class="law-tag">《消费者权益保护法》第25、55条</span>`
+            },
+            '校园欺凌|被打|被同学|校园暴力': {
+                title: '校园欺凌维权',
+                answer: `<strong>《未成年人保护法》第39条：</strong>
+                    <div class="step">学校发现欺凌须立即制止、处置、报告</div>
+                    <strong>维权步骤：</strong>
+                    <ul><li>拍照记录伤情，保留诊断书</li>
+                    <li>向班主任、学校反映</li>
+                    <li>向教育局投诉</li>
+                    <li>严重情形报警或起诉</li></ul>
+                    <span class="law-tag">《未成年人保护法》第39条</span>
+                    <span class="law-tag">《民法典》第1188条（监护人责任）</span>`
+            },
+            '诈骗|被骗|电信诈骗|网络诈骗': {
+                title: '诈骗应对与追损',
+                answer: `<strong>紧急处理：</strong>
+                    <div class="step">⚡ 立即拨打 <strong>96110</strong> 或 <strong>110</strong>，联系银行止付</div>
+                    <ul><li>保存转账记录、聊天截图、骗子账号</li>
+                    <li>到派出所立案，获取受案回执</li></ul>
+                    <strong>常见诈骗：</strong>
+                    <ul><li>冒充公检法（100%诈骗）</li>
+                    <li>高收益投资理财</li>
+                    <li>养老诈骗</li></ul>
+                    <span class="law-tag">《刑法》第266条（诈骗罪）</span>`
+            },
+            '赡养|不赡养|老人|赡养费': {
+                title: '赡养义务与维权',
+                answer: `<strong>《老年人权益保障法》第14条：</strong>
+                    <div class="step">成年子女有赡养父母的法定义务（经济、生活、精神）</div>
+                    <strong>不赡养的法律后果：</strong>
+                    <ul><li>可起诉要求支付赡养费</li>
+                    <li>拒不执行可强制执行</li>
+                    <li>情节严重可追究遗弃罪</li></ul>
+                    <span class="law-tag">《老年人权益保障法》第14条</span>
+                    <span class="law-tag">《民法典》第1067条</span>`
+            },
+            '工伤|工伤赔偿|工伤认定': {
+                title: '工伤赔偿指南',
+                answer: `<strong>《工伤保险条例》：</strong>
+                    <div class="step">工伤认定→劳动能力鉴定→赔偿</div>
+                    <strong>赔偿项目：</strong>
+                    <ul><li>医疗费、护理费、住院伙食补助</li>
+                    <li>停工留薪期工资（原待遇）</li>
+                    <li>一次性伤残补助金（7-27个月工资）</li>
+                    <li>伤残津贴（1-4级）</li></ul>
+                    <strong>时效：</strong>事故发生后1年内申请工伤认定
+                    <span class="law-tag">《工伤保险条例》第17、35-37条</span>`
+            },
+            '劳动合同|签合同|合同纠纷': {
+                title: '劳动合同签订要点',
+                answer: `<strong>《劳动合同法》第17条必备条款：</strong>
+                    <ul><li>用人单位信息</li><li>劳动者信息</li>
+                    <li>合同期限</li><li>工作内容与地点</li>
+                    <li>工作时间和休假</li><li>劳动报酬</li>
+                    <li>社会保险</li></ul>
+                    <strong>禁止条款（无效）：</strong>
+                    <ul><li>"自愿放弃社保"</li>
+                    <li>"放弃所有劳动权利"</li></ul>
+                    <span class="law-tag">《劳动合同法》第17、26条</span>`
+            },
+            '借条|欠条|借款|民间借贷': {
+                title: '民间借贷注意事项',
+                answer: `<strong>《民法典》借款合同章：</strong>
+                    <div class="step">借条必备：出借人、借款人、金额、利率、日期</div>
+                    <strong>利率上限：</strong>不超过LPR的4倍（当前约15.4%）
+                    <ul><li>建议银行转账，保留凭证</li>
+                    <li>大额借贷建议公证</li></ul>
+                    <span class="law-tag">《民法典》第667-680条</span>`
+            },
+            '租房|押金|房东不退|租赁合同': {
+                title: '租房维权指南',
+                answer: `<strong>《民法典》租赁合同章：</strong>
+                    <div class="step">押金应在租期届满后合理期限内退还</div>
+                    <strong>常见纠纷：</strong>
+                    <ul><li>房东无故扣留押金</li>
+                    <li>维修责任不明</li>
+                    <li>提前解约违约金</li></ul>
+                    <strong>维权：</strong>协商→住建局投诉→法院诉讼
+                    <span class="law-tag">《民法典》第703-734条</span>`
+            }
+        };
+
+        // ============================================================
+        //  2. 增强匹配算法（权重评分）
+        // ============================================================
+        function findLegalAnswer(question) {
+            const q = question.trim();
+            let best = null;
+            let bestScore = 0;
+            for (const pattern in legalKB) {
+                const patterns = pattern.split('|');
+                let score = 0;
+                for (const p of patterns) {
+                    if (q.includes(p)) {
+                        // 关键词越长权重越高
+                        score += p.length * 2;
+                    }
+                }
+                // 如果问题中包含多个关键词，提高权重
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = legalKB[pattern];
+                }
+            }
+            if (bestScore >= 4) return best;
+            return null;
+        }
+
+        // ============================================================
+        //  3. 默认通用回答（增强版）
+        // ============================================================
+        function generateDefaultAnswer(question) {
+            return {
+                title: '法律咨询解答',
+                answer: `<strong>感谢您的提问！</strong> 为您整理通用法律指引：
+                    <strong>维权四步法：</strong>
+                    <ul><li><strong>第一步：收集证据</strong>——合同、票据、聊天记录、照片</li>
+                    <li><strong>第二步：协商处理</strong>——书面沟通，留存记录</li>
+                    <li><strong>第三步：申请调解</strong>——人民调解委员会或行业主管部门</li>
+                    <li><strong>第四步：仲裁/诉讼</strong>——劳动仲裁（1年时效）或民事诉讼（3年时效）</li></ul>
+                    <strong>免费法律援助：</strong>
+                    <ul><li>法律援助热线：<strong>12348</strong></li>
+                    <li>消费者投诉：<strong>12315</strong></li>
+                    <li>劳动维权：当地人社局</li></ul>
+                    <span class="law-tag">《民法典》总则编</span>
+                    <span class="law-tag">《法律援助法》</span>`
+            };
+        }
+
+        // ============================================================
+        //  4. 年龄热门问题
+        // ============================================================
+        const ageQuickQuestions = {
+            youth: ['被同学打了怎么办？', '老师体罚学生违法吗？', '未成年人网游充值能退款吗？', '校园欺凌如何报警？', '父母离婚我跟谁？'],
+            student: ['兼职不给工资怎么办？', '校园贷还不上怎么办？', '房东不退押金怎么处理？', '实习期间受伤有赔偿吗？', '考试作弊会被开除吗？'],
+            worker: ['被公司辞退有没有赔偿？', '试用期可以随便辞退员工吗？', '加班不给加班费怎么办？', '五险一金公司不缴纳怎么处理？', '签了离职协议还能索赔吗？'],
+            family: ['离婚房子怎么分？', '孩子抚养权怎么争取？', '老人遗产如何继承？', '邻居噪音扰民怎么投诉？', '被骗了钱能要回来吗？'],
+            senior: ['子女不赡养老人违法吗？', '被诈骗了怎么报警？', '立遗嘱需要什么条件？', '养老院虐待老人怎么投诉？', '医疗纠纷如何维权？']
+        };
+
+        // ============================================================
+        //  5. 知识库数据（用于知识页面）
+        // ============================================================
+        const knowledgeData = {
+            minfa1: { title: '《民法典》合同篇核心要点',
+                content: `<h4>合同的成立</h4><p>要约→承诺，承诺到达时合同成立。</p><h4>合同效力</h4><p>违反法律强制性规定或公序良俗的合同无效。</p><div class="law-ref">《民法典》第469、502、153条</div><h4>违约责任</h4><p>继续履行、补救措施、赔偿损失（含可预见的间接损失）。</p><div class="law-ref">《民法典》第577、584条</div>` },
+            minfa2: { title: '诉讼时效',
+                content: `<h4>一般诉讼时效：3年</h4><p>自知道权利受损及义务人之日起算。</p><div class="law-ref">《民法典》第188条</div><h4>中断情形</h4><p>提出履行请求、义务人同意履行、提起诉讼/仲裁，时效重新计算。</p><h4>最长保护期：20年</h4>` },
+            labor1: { title: '劳动合同必备条款',
+                content: `<h4>必备条款（《劳动合同法》第17条）</h4><ul><li>用人单位信息</li><li>劳动者信息</li><li>合同期限</li><li>工作内容与地点</li><li>工作时间与休假</li><li>劳动报酬</li><li>社会保险</li><li>劳动保护</li></ul><h4>无效条款</h4><ul><li>"自愿放弃社保"</li><li>"放弃所有劳动权利"</li><li>"工作失误自愿罚款"</li></ul>` },
+            labor2: { title: '经济补偿N与2N',
+                content: `<h4>N（正常补偿）</h4><ul><li>协商解除</li><li>经济性裁员</li><li>合同期满不续签</li></ul><h4>2N（违法辞退赔偿金）</h4><p>无正当理由辞退，支付经济补偿金的2倍。</p><div class="law-ref">《劳动合同法》第46、47、87条</div>` },
+            family1: { title: '婚前财产 vs 婚后共同财产',
+                content: `<h4>共同财产（《民法典》第1062条）</h4><ul><li>婚后工资、奖金</li><li>生产经营收益</li><li>婚后购买的房产、车辆</li></ul><h4>个人财产（《民法典》第1063条）</h4><ul><li>婚前个人财产</li><li>人身损害赔偿</li><li>遗嘱或赠与明确归一方的</li></ul>` },
+            consumer1: { title: '七天无理由退货',
+                content: `<h4>适用范围（《消法》第25条）</h4><p>网络、电视、电话等远程购物，收货后7日内可退货。</p><h4>例外</h4><ul><li>定制品</li><li>鲜活易腐</li><li>已拆封的音像制品</li></ul><h4>商家拒退</h4><ol><li>平台投诉</li><li>12315投诉</li><li>法院诉讼</li></ol>` },
+            consumer2: { title: '三倍赔偿（假货）',
+                content: `<div class="law-ref">《消费者权益保护法》第55条：欺诈→三倍赔偿，最低500元。</div><h4>什么是"欺诈"？</h4><ul><li>以次充好</li><li>假冒品牌</li><li>虚假宣传</li></ul><h4>维权证据</h4><ol><li>购买凭证</li><li>商品照片</li><li>鉴定报告</li></ol>` }
+        };
+
+        // ============================================================
+        //  6. 案例数据
+        // ============================================================
+        const cases = [
+            { cat: 'labor', title: '员工被无故辞退，成功获赔2N赔偿金',
+                tags: ['劳动纠纷', '违法辞退', '仲裁胜诉'],
+                summary: '张某在某科技公司工作5年，2024年2月公司以"不适合岗位需求"为由突然解除劳动合同。张某申请劳动仲裁。',
+                result: '仲裁委认定公司未能提供书面录用标准及不符合条件的证据，构成违法辞退。裁决公司支付2N赔偿金共计10万元。',
+                law: '《劳动合同法》第87条、第39条' },
+            { cat: 'family', title: '婚前父母出资购房，离婚认定为个人财产',
+                tags: ['婚姻家庭', '财产分割', '房产纠纷'],
+                summary: '王某与李某离婚，争议焦点为婚前王某父母全款购买、登记在王某名下的房产是否属于共同财产。',
+                result: '法院认定该房产系王某父母赠与王某一人的个人财产，不参与分割。',
+                law: '《民法典》第1063条第3项' },
+            { cat: 'consumer', title: '网购假冒商品，成功获得三倍赔偿',
+                tags: ['消费维权', '假冒伪劣', '三倍赔偿'],
+                summary: '赵某购买2000元名牌化妆品，收货后鉴定为假货，商家拒绝赔偿。',
+                result: '法院认定欺诈，判决退还货款2000元+三倍赔偿6000元，合计8000元。',
+                law: '《消费者权益保护法》第55条' },
+            { cat: 'property', title: '房东违约提前驱逐租客，法院判赔违约金',
+                tags: ['房产纠纷', '租房维权', '合同违约'],
+                summary: '陈某租约未到期，房东以"房屋出售"为由强行换锁驱逐。',
+                result: '法院认定根本违约，判决赔偿2个月租金违约金+搬家损失。',
+                law: '《民法典》第703条、第577条' },
+            { cat: 'senior', title: '子女不赡养老人，法院强制执行赡养费',
+                tags: ['老年权益', '赡养纠纷', '法院判决'],
+                summary: '刘某（72岁）三子女均拒绝支付赡养费，生活陷入困境。',
+                result: '法院判决每名子女每月支付800元赡养费+医疗费，强制执行。',
+                law: '《老年人权益保障法》第14条' },
+            { cat: 'labor', title: '公司不缴社保，员工"被迫辞职"获经济补偿',
+                tags: ['劳动纠纷', '社保纠纷', '被迫辞职'],
+                summary: '孙某工作3年，公司一直未缴纳社保，孙某以此为由辞职。',
+                result: '仲裁委认定可依《劳动合同法》第38条被迫辞职，裁决支付3个月工资补偿。',
+                law: '《劳动合同法》第38条第3项、第46条' },
+            { cat: 'consumer', title: '校园贷陷阱，大学生追回被骗资金',
+                tags: ['消费维权', '校园贷', '诈骗案'],
+                summary: '大学生被诱导签署"校园贷"，实际到手仅70%，年化利率超100%。',
+                result: '法院认定利率远超法定上限，超出部分无效，仅需按LPR四倍归还。',
+                law: '最高法民间借贷司法解释第25条' },
+            { cat: 'family', title: '隐匿财产离婚，法院少分其应得份额',
+                tags: ['婚姻家庭', '财产分割', '隐匿资产'],
+                summary: '吴某离婚时故意隐瞒价值80万的股票账户，被司法查询发现。',
+                result: '法院依据《民法典》第1092条，吴某仅获20%份额，对方获80%。',
+                law: '《民法典》第1092条' }
+        ];
+
+        // ============================================================
+        //  7. 文书模板
+        // ============================================================
+        const docTemplates = {
+            iou: {
+                title: '📋 借条 / 欠条生成',
+                fields: [
+                    { name: 'lender', label: '出借人姓名', placeholder: '李四' },
+                    { name: 'borrower', label: '借款人姓名', placeholder: '张三' },
+                    { name: 'amount', label: '借款金额（元）', placeholder: '10000' },
+                    { name: 'rate', label: '月利率（%，不超过2%）', placeholder: '1' },
+                    { name: 'date', label: '借款日期', placeholder: '2026年6月1日' },
+                    { name: 'duedate', label: '还款日期', placeholder: '2026年12月1日' }
+                ],
+                generate: (d) =>
+                    `借  条\n\n今有${d.borrower||'借款人'}（借款人）向${d.lender||'出借人'}（出借人）借款人民币${d.amount||'___'}元。\n\n借款日期：${d.date||'____年__月__日'}\n约定还款日期：${d.duedate||'____年__月__日'}\n月利率：${d.rate||'0'}%\n\n借款人承诺按时还款，逾期未还支付逾期利息及合理费用。\n\n出借人（签字）：${d.lender||'___________'}　　借款人（签字）：${d.borrower||'___________'}\n日期：${d.date||'____年__月__日'}\n\n【依据：《民法典》第667-680条】`
+            },
+            labor: {
+                title: '💼 劳动合同（简易版）',
+                fields: [
+                    { name: 'employer', label: '用人单位', placeholder: 'XX有限公司' },
+                    { name: 'employee', label: '员工姓名', placeholder: '张三' },
+                    { name: 'position', label: '工作岗位', placeholder: '销售专员' },
+                    { name: 'salary', label: '月工资（元）', placeholder: '6000' },
+                    { name: 'startdate', label: '合同开始日期', placeholder: '2026年6月1日' },
+                    { name: 'period', label: '合同期限', placeholder: '2年' }
+                ],
+                generate: (d) =>
+                    `劳动合同（简易版）\n\n甲方：${d.employer||'___________'}\n乙方：${d.employee||'___________'}\n\n一、岗位：${d.position||'___________'}\n二、期限：${d.startdate||'____年__月__日'}起，${d.period||'___'}，试用期___个月\n三、工资：月${d.salary||'___'}元，每月___日发放\n四、工作时间：每日≤8小时，每周≤40小时\n五、社会保险：依法缴纳五险一金\n\n甲方（盖章）：${d.employer||'___________'}　　乙方（签字）：${d.employee||'___________'}\n\n【依据：《劳动合同法》第17条】`
+            },
+            rental: {
+                title: '🏠 房屋租赁合同',
+                fields: [
+                    { name: 'landlord', label: '出租方（房东）', placeholder: '李四' },
+                    { name: 'tenant', label: '承租方（租客）', placeholder: '张三' },
+                    { name: 'address', label: '房屋地址', placeholder: 'XX市XX区XX路X号' },
+                    { name: 'rent', label: '月租金（元）', placeholder: '3000' },
+                    { name: 'deposit', label: '押金（元）', placeholder: '6000' },
+                    { name: 'startdate', label: '租赁开始日期', placeholder: '2026年6月1日' },
+                    { name: 'months', label: '租赁期限（月）', placeholder: '12' }
+                ],
+                generate: (d) =>
+                    `房屋租赁合同\n\n出租方（甲方）：${d.landlord||'___________'}\n承租方（乙方）：${d.tenant||'___________'}\n\n一、房屋地址：${d.address||'___________'}\n二、租期：${d.startdate||'____年__月__日'}起，共${d.months||'___'}个月\n三、租金：每月${d.rent||'___'}元，每月___日前支付\n四、押金：${d.deposit||'___'}元，期满___日内退还\n五、维修责任：正常损耗甲方维修，乙方人为损坏自修\n\n甲方（签字）：${d.landlord||'___________'}　　乙方（签字）：${d.tenant||'___________'}\n\n【依据：《民法典》第703-734条】`
+            },
+            divorce: {
+                title: '📑 离婚协议书',
+                fields: [
+                    { name: 'husband', label: '男方姓名', placeholder: '张三' },
+                    { name: 'wife', label: '女方姓名', placeholder: '李四' },
+                    { name: 'child', label: '子女姓名及年龄', placeholder: '张小明，8岁' },
+                    { name: 'custody', label: '抚养权归属', placeholder: '归女方' },
+                    { name: 'alimony', label: '抚养费（元/月）', placeholder: '2000' },
+                    { name: 'property', label: '财产分割方案', placeholder: 'XX房产归男方，补偿女方XX万元' }
+                ],
+                generate: (d) =>
+                    `离婚协议书\n\n男方：${d.husband||'___________'}\n女方：${d.wife||'___________'}\n\n一、子女抚养：${d.child||'___________'}，${d.custody||'___方'}抚养，另一方每月支付抚养费${d.alimony||'___'}元至18周岁。\n二、财产分割：${d.property||'___________'}\n三、共同债务：共同承担，个人债务各自负责。\n\n男方（签字）：${d.husband||'___________'}　　女方（签字）：${d.wife||'___________'}\n\n【依据：《民法典》第1076、1084条】`
+            },
+            complaint: {
+                title: '⚖️ 民事起诉状',
+                fields: [
+                    { name: 'plaintiff', label: '原告姓名', placeholder: '张三' },
+                    { name: 'defendant', label: '被告姓名/单位', placeholder: '李四' },
+                    { name: 'court', label: '起诉法院', placeholder: 'XX市XX区人民法院' },
+                    { name: 'claim', label: '诉讼请求', placeholder: '要求被告支付欠款10000元及利息' },
+                    { name: 'facts', label: '事实与理由', placeholder: '2025年3月，被告向原告借款10000元，约定2025年9月归还，至今未还……' },
+                    { name: 'amount', label: '诉讼标的额（元）', placeholder: '10000' }
+                ],
+                generate: (d) =>
+                    `民事起诉状\n\n原告：${d.plaintiff||'___________'}\n被告：${d.defendant||'___________'}\n\n诉讼请求：${d.claim||'___________'}\n\n事实与理由：${d.facts||'___________'}\n\n此致\n${d.court||'___________'}\n\n原告（签字）：${d.plaintiff||'___________'}\n\n【诉讼费参考：${d.amount?calcLawsuitFee(Number(d.amount))+'元':'___'}】\n【依据：《民事诉讼法》第120条】`
+            },
+            support: {
+                title: '❤️ 赡养协议书',
+                fields: [
+                    { name: 'parent', label: '被赡养人姓名', placeholder: '张老先生' },
+                    { name: 'children', label: '赡养人姓名（用、分隔）', placeholder: '张大明、张小红' },
+                    { name: 'fee', label: '每人每月赡养费（元）', placeholder: '1000' },
+                    { name: 'medical', label: '医疗费分担方式', placeholder: '平均分担' },
+                    { name: 'residence', label: '居住安排', placeholder: '随大儿子张大明共同生活' }
+                ],
+                generate: (d) =>
+                    `赡养协议书\n\n被赡养人：${d.parent||'___________'}\n赡养人：${d.children||'___________'}\n\n一、赡养费：每人每月${d.fee||'___'}元，每月___日前支付。\n二、医疗费用：${d.medical||'平均分担'}。\n三、居住安排：${d.residence||'___________'}。\n四、精神慰藉：定期探望老人。\n\n被赡养人（签字）：${d.parent||'___________'}\n赡养人（签字）：${(d.children||'___________').split('、').map(c=>c+'（签字）：___________').join('\n')}\n\n【依据：《老年人权益保障法》第14条】`
+            }
+        };
+
+        // ============================================================
+        //  8. 问卷数据
+        // ============================================================
+        const quizData = {
+            worker: [
+                { q: '您是否签署了正式书面劳动合同？', opts: ['已签署正式合同', '口头协议/未签合同', '只签试用协议'], scores: [0, 3, 2] },
+                { q: '公司是否为您缴纳了社保（五险一金）？', opts: ['按时足额缴纳', '未缴纳或不足', '不清楚'], scores: [0, 3, 2] },
+                { q: '您是否遇到过加班不给加班费？', opts: ['没有', '有但未维权', '经常发生'], scores: [0, 1, 2] },
+                { q: '公司是否有裁员或强制转岗迹象？', opts: ['没有', '有裁员计划', '已被调岗降薪'], scores: [0, 1, 3] },
+                { q: '您是否了解劳动仲裁申请流程？', opts: ['了解', '有所了解', '完全不了解'], scores: [0, 1, 2] }
+            ],
+            consumer: [
+                { q: '您是否购买过价格异常低廉的商品？', opts: ['没有', '偶尔', '经常'], scores: [0, 2, 3] },
+                { q: '是否遇到过商家拒绝七天无理由退货？', opts: ['没有', '有过但放弃', '有，还在维权'], scores: [0, 2, 1] },
+                { q: '是否参与过"免费领奖品"等活动并消费？', opts: ['没有', '一两次', '多次'], scores: [0, 2, 3] },
+                { q: '是否购买过高收益理财产品？', opts: ['没有', '研究过未购', '已购买'], scores: [0, 1, 3] },
+                { q: '是否保留重要消费的票据和合同？', opts: ['都保留', '部分保留', '基本不保留'], scores: [0, 1, 2] }
+            ],
+            family: [
+                { q: '婚姻财产是否有书面约定？', opts: ['有婚前协议', '没有正式约定', '财产混同'], scores: [0, 1, 2] },
+                { q: '家庭是否存在抚养费或赡养费纠纷？', opts: ['没有问题', '有潜在矛盾', '已有明显纠纷'], scores: [0, 1, 3] },
+                { q: '是否有以他人名义持有的重大财产？', opts: ['不存在', '有少量', '较多代持'], scores: [0, 1, 3] },
+                { q: '家庭成员是否有未书面化的大额借贷？', opts: ['没有', '有口头约定', '有书面借条'], scores: [0, 2, 0] },
+                { q: '家中老人是否有立遗嘱的打算？', opts: ['已立公证遗嘱', '有意向未立', '无此计划'], scores: [0, 1, 1] }
+            ],
+            rental: [
+                { q: '租房合同是否明确押金退还条件？', opts: ['有明确约定', '较模糊', '没有约定'], scores: [0, 1, 3] },
+                { q: '合同是否明确维修责任归属？', opts: ['有明确约定', '不清楚', '无约定'], scores: [0, 1, 2] },
+                { q: '房东是否出示了房产证或授权委托书？', opts: ['已核实', '没有核实', '不清楚'], scores: [0, 2, 3] },
+                { q: '租金是否按月支付并保存转账记录？', opts: ['有记录', '现金无收据', '微信有记录'], scores: [0, 3, 0] },
+                { q: '房东是否提前通知过涨价或驱逐？', opts: ['没有', '有过口头暗示', '已正式通知'], scores: [0, 1, 3] }
+            ]
+        };
+
+        // ============================================================
+        //  9. 全局状态
+        // ============================================================
+        let currentAge = 'worker';
+        let currentQuiz = 'worker',
+            currentQ = 0,
+            userAnswers = [];
+        let currentDocType = null;
+        let chatHistory = [];
+        const STORAGE_KEY = 'fadun_chat_history';
+
+        // ============================================================
+        //  10. 导航
+        // ============================================================
+        function switchPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            const target = document.getElementById('page-' + page);
+            if (target) target.classList.add('active');
+            const btns = document.querySelectorAll('.nav-btn');
+            const map = { home: 0, qa: 1, risk: 2, docs: 3, cases: 4, calc: 5, knowledge: 6 };
+            if (map[page] !== undefined) btns[map[page]].classList.add('active');
+            // 关闭移动端菜单
+            document.getElementById('mainNav').classList.remove('open');
+            window.scrollTo(0, 0);
+        }
+
+        // ============================================================
+        //  11. 移动端菜单
+        // ============================================================
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('open');
+        });
+
+        // ============================================================
+        //  12. 年龄选择 & 热门问题
+        // ============================================================
+        function selectAge(age, el) {
+            document.querySelectorAll('.age-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            currentAge = age;
+            const qs = ageQuickQuestions[age] || [];
+            const list = document.querySelector('.qq-list');
+            list.innerHTML = qs.map(q => `<div class="qq-item" onclick="askQuestion('${q}')">${q}</div>`).join('');
+        }
+
+        // ============================================================
+        //  13. 聊天功能 + localStorage持久化
+        // ============================================================
+        function loadChatHistory() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                if (data) {
+                    chatHistory = JSON.parse(data);
+                    const container = document.getElementById('chat-messages');
+                    container.innerHTML = chatHistory.map(msg =>
+                        `<div class="msg ${msg.role}">
+                            <div class="msg-avatar">${msg.role === 'ai' ? '⚖️' : '👤'}</div>
+                            <div class="msg-bubble">${msg.html}</div>
+                        </div>`
+                    ).join('');
+                    container.scrollTop = container.scrollHeight;
+                } else {
+                    // 默认欢迎语
+                    const welcome =
+                        `<strong>您好！我是法盾AI法律顾问。</strong><br/>请直接输入您的法律问题，我会依据《民法典》《劳动法》《消费者权益保护法》等为您提供解答。<br/><br/><strong>⚠️ 声明：</strong>解答仅供参考，不构成正式法律意见。`;
+                    addMessage('ai', welcome);
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        function saveChatHistory() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory));
+            } catch (e) { /* ignore */ }
+        }
+
+        function addMessage(role, html) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'msg ' + role;
+            const avatar = role === 'ai' ? '⚖️' : '👤';
+            div.innerHTML = `<div class="msg-avatar">${avatar}</div><div class="msg-bubble">${html}</div>`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            chatHistory.push({ role, html });
+            saveChatHistory();
+        }
+
+        function showTyping() {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'msg ai';
+            div.id = 'typing-indicator';
+            div.innerHTML =
+                `<div class="msg-avatar">⚖️</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function removeTyping() {
+            const el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+            addMessage('user', text);
+            input.value = '';
+            showTyping();
+            setTimeout(() => {
+                removeTyping();
+                const result = findLegalAnswer(text) || generateDefaultAnswer(text);
+                // 添加复制按钮
+                const copyBtn =
+                    `<button class="btn-copy" onclick="copyText(this.parentElement.innerText.replace('复制', ''))">📋 复制</button>`;
+                const html = `<strong>📋 ${result.title}</strong><br/><br/>${result.answer}<br/>${copyBtn}`;
+                addMessage('ai', html);
+            }, 1200);
+        }
+
+        function askQuestion(q) {
+            switchPage('qa');
+            document.getElementById('chat-input').value = q;
+            sendMessage();
+        }
+
+        // ============================================================
+        //  14. 复制功能
+        // ============================================================
+        function copyText(text) {
+            // 去除"复制"按钮文字干扰
+            const clean = text.replace(/📋\s*复制/g, '').trim();
+            navigator.clipboard.writeText(clean).then(() => {
+                showToast('✅ 已复制到剪贴板');
+            }).catch(() => {
+                // fallback
+                const ta = document.createElement('textarea');
+                ta.value = clean;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                showToast('✅ 已复制到剪贴板');
+            });
+        }
+
+        // ============================================================
+        //  15. Toast提示
+        // ============================================================
+        function showToast(msg) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(el._timer);
+            el._timer = setTimeout(() => el.classList.remove('show'), 2000);
+        }
+
+        // ============================================================
+        //  16. 问卷功能
+        // ============================================================
+        function switchQuiz(type, el) {
+            document.querySelectorAll('.quiz-age-tab').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            currentQuiz = type;
+            currentQ = 0;
+            userAnswers = [];
+            renderQuestion();
+            document.getElementById('risk-result-panel').innerHTML =
+                '<div style="text-align:center;color:var(--text-light);padding:60px 20px;"><div style="font-size:56px;margin-bottom:12px;">🔍</div><div style="font-size:16px;font-weight:600;">完成问卷后</div><div style="font-size:13px;margin-top:6px;">您的风险评估报告将在这里显示</div></div>';
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentQuiz][currentQ];
+            const total = quizData[currentQuiz].length;
+            document.getElementById('quiz-num').textContent = `第 ${currentQ+1} 题 / 共 ${total} 题`;
+            document.getElementById('quiz-progress-bar').style.width = ((currentQ + 1) / total * 100) + '%';
+            document.getElementById('quiz-question').textContent = q.q;
+            document.getElementById('quiz-options').innerHTML = q.opts.map((o, i) =>
+                `<div class="quiz-option${userAnswers[currentQ]===i?' selected':''}" onclick="selectOption(${i})">${o}</div>`
+            ).join('');
+            document.getElementById('quiz-prev-btn').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
+            document.getElementById('quiz-next-btn').textContent = currentQ === total - 1 ? '查看报告' : '下一题';
+        }
+
+        function selectOption(i) {
+            userAnswers[currentQ] = i;
+            document.querySelectorAll('.quiz-option').forEach((el, idx) => el.classList.toggle('selected', idx === i));
+        }
+
+        function quizPrev() { if (currentQ > 0) { currentQ--;
+                renderQuestion(); } }
+
+        function quizNext() {
+            if (userAnswers[currentQ] === undefined) { showToast('请先选择一个选项'); return; }
+            const total = quizData[currentQuiz].length;
+            if (currentQ < total - 1) { currentQ++;
+                renderQuestion(); } else showRiskResult();
+        }
+
+        function showRiskResult() {
+            let totalScore = 0;
+            quizData[currentQuiz].forEach((q, i) => {
+                totalScore += q.scores[userAnswers[i] || 0];
+            });
+            const maxScore = quizData[currentQuiz].reduce((s, q) => s + Math.max(...q.scores), 0);
+            const pct = Math.round(totalScore / maxScore * 100);
+            let level, cls, emoji;
+            if (pct <= 30) { level = '低风险';
+                cls = 'score-low';
+                emoji = '✅'; } else if (pct <= 60) { level = '中等风险';
+                cls = 'score-mid';
+                emoji = '⚠️'; } else { level = '高风险';
+                cls = 'score-high';
+                emoji = '🚨'; }
+
+            const riskItems = generateRiskItems(currentQuiz, totalScore, pct);
+            document.getElementById('risk-result-panel').innerHTML = `
+                <div style="font-size:17px;font-weight:700;color:var(--primary);margin-bottom:12px;">📊 风险评估报告</div>
+                <div class="score-circle ${cls}">
+                    <div class="score-num">${pct}</div>
+                    <div class="score-label">风险指数</div>
+                </div>
+                <div style="text-align:center;font-size:18px;font-weight:700;">${emoji} ${level}</div>
+                <div style="text-align:center;font-size:13px;color:var(--text-sub);margin-bottom:16px;">综合得分：${totalScore}/${maxScore}</div>
+                <div class="risk-items">${riskItems}</div>
+                <div class="risk-actions">
+                    <button class="btn btn-accent" onclick="switchPage('qa')">🤖 咨询AI</button>
+                    <button class="btn btn-success btn-sm" onclick="copyText(document.querySelector('.risk-items').innerText)">📋 复制报告</button>
+                </div>
+            `;
+        }
+
+        function generateRiskItems(type, score, pct) {
+            const map = {
+                worker: [
+                    { l: 'low', icon: '✅', title: '劳动合同保障', desc: '合同基本合规，保存好副本' },
+                    { l: pct > 40 ? 'high' : 'mid', icon: pct > 60 ? '🚨' : '⚠️', title: '社保缴纳风险',
+                    desc: '定期查询社保记录' },
+                    { l: pct > 50 ? 'high' : 'low', icon: '💡', title: '维权意识', desc: '了解12333和劳动仲裁流程' }
+                ],
+                consumer: [
+                    { l: pct > 60 ? 'high' : 'mid', icon: pct > 60 ? '🚨' : '⚠️', title: '消费欺诈风险',
+                    desc: '警惕低价陷阱，保留发票' },
+                    { l: 'low', icon: '✅', title: '理财安全', desc: '远离高收益承诺' },
+                    { l: pct > 40 ? 'mid' : 'low', icon: '💡', title: '维权准备', desc: '保存交易记录，拨打12315' }
+                ],
+                family: [
+                    { l: pct > 50 ? 'high' : 'mid', icon: pct > 50 ? '🚨' : '⚠️', title: '财产权益保护',
+                        desc: '重要财产做书面约定' },
+                    { l: pct > 30 ? 'mid' : 'low', icon: '💡', title: '家庭纠纷预防', desc: '借贷务必签订借条' },
+                    { l: 'low', icon: '✅', title: '遗嘱规划', desc: '有传承需求建议公证遗嘱' }
+                ],
+                rental: [
+                    { l: pct > 50 ? 'high' : 'mid', icon: pct > 50 ? '🚨' : '⚠️', title: '租房合同风险',
+                        desc: '完善书面约定，明确条款' },
+                    { l: pct > 40 ? 'mid' : 'low', icon: '⚠️', title: '押金风险', desc: '明确押金退还条件' },
+                    { l: 'low', icon: '✅', title: '维权建议', desc: '保留转账记录，可向住建局投诉' }
+                ]
+            };
+            const items = map[type] || map.worker;
+            return items.map(item =>
+                `<div class="risk-item ri-${item.l}">
+                    <div class="ri-icon">${item.icon}</div>
+                    <div class="ri-content"><h4>${item.title}</h4><p>${item.desc}</p></div>
+                </div>`
+            ).join('');
+        }
+
+        // ============================================================
+        //  17. 文书生成
+        // ============================================================
+        function openDocEditor(type) {
+            currentDocType = type;
+            const tpl = docTemplates[type];
+            document.getElementById('doc-editor-title').textContent = tpl.title;
+            document.getElementById('doc-form').innerHTML = buildForm(type, tpl.fields);
+            document.getElementById('doc-editor').style.display = 'block';
+            document.getElementById('doc-preview').style.display = 'none';
+            document.getElementById('doc-editor').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function buildForm(type, fields) {
+            let html = '';
+            for (let i = 0; i < fields.length; i += 2) {
+                const f1 = fields[i],
+                    f2 = fields[i + 1];
+                html += `<div class="form-row">
+                    <div class="form-group">
+                        <label>${f1.label}</label>
+                        <input class="form-input" id="doc-${type}-${f1.name}" placeholder="${f1.placeholder}" />
+                        <div class="form-error" id="err-${type}-${f1.name}"></div>
+                    </div>
+                    ${f2 ? `<div class="form-group">
+                        <label>${f2.label}</label>
+                        <input class="form-input" id="doc-${type}-${f2.name}" placeholder="${f2.placeholder}" />
+                        <div class="form-error" id="err-${type}-${f2.name}"></div>
+                    </div>` : '<div></div>'}
+                </div>`;
+            }
+            return html;
+        }
+
+        function generateDoc() {
+            const type = currentDocType;
+            const tpl = docTemplates[type];
+            const data = {};
+            let valid = true;
+            tpl.fields.forEach(f => {
+                const el = document.getElementById(`doc-${type}-${f.name}`);
+                const err = document.getElementById(`err-${type}-${f.name}`);
+                const val = el ? el.value.trim() : '';
+                if (!val && f.name !== 'rate' && f.name !== 'amount' && f.name !== 'fee' && f.name !== 'alimony' && f
+                    .name !== 'rent' && f.name !== 'deposit') {
+                    // 非数字字段做提醒，但不强制
+                }
+                data[f.name] = val || '___';
+                if (err) err.textContent = '';
+            });
+            const text = tpl.generate(data);
+            const preview = document.getElementById('doc-preview');
+            preview.textContent = text;
+            preview.innerHTML = text + `<br/><button class="copy-btn" onclick="copyText(document.getElementById('doc-preview').innerText.replace(/<[^>]*>/g,''))">📋 复制全文</button>`;
+            preview.style.display = 'block';
+            preview.scrollIntoView({ behavior: 'smooth' });
+            showToast('✅ 文书已生成');
+        }
+
+        function clearDocEditor() {
+            document.getElementById('doc-editor').style.display = 'none';
+            document.getElementById('doc-preview').style.display = 'none';
+            currentDocType = null;
+        }
+
+        // ============================================================
+        //  18. 案例
+        // ============================================================
+        let currentCaseFilter = 'all';
+
+        function renderCases(filter = 'all', search = '') {
+            const list = document.getElementById('case-list');
+            let filtered = filter === 'all' ? cases : cases.filter(c => c.cat === filter);
+            if (search.trim()) {
+                const s = search.trim().toLowerCase();
+                filtered = filtered.filter(c => c.title.includes(s) || c.summary.includes(s) || c.tags.some(t => t.includes(
+                s)));
+            }
+            if (filtered.length === 0) {
+                list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);">没有匹配的案例</div>';
+                return;
+            }
+            list.innerHTML = filtered.map(c => `
+                <div class="case-card" onclick="openCaseModal(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+                    <div class="case-meta">
+                        <span class="case-tag ${c.cat}">${getCatLabel(c.cat)}</span>
+                        ${c.tags.map(t=>`<span class="case-tag">${t}</span>`).join('')}
+                    </div>
+                    <div class="case-title">${c.title}</div>
+                    <div class="case-summary">${c.summary}</div>
+                    <div class="case-result">⚖️ ${c.result}</div>
+                </div>
+            `).join('');
+        }
+
+        function getCatLabel(cat) {
+            const m = { labor: '劳动纠纷', family: '婚姻家庭', consumer: '消费维权', property: '房产纠纷', senior: '老年权益' };
+            return m[cat] || cat;
+        }
+
+        function filterCases(cat, el) {
+            currentCaseFilter = cat;
+            document.querySelectorAll('.case-filter-btn').forEach(b => b.classList.remove('active'));
+            if (el) el.classList.add('active');
+            const search = document.getElementById('caseSearchInput').value;
+            renderCases(cat, search);
+        }
+
+        function filterCasesBySearch() {
+            const search = document.getElementById('caseSearchInput').value;
+            renderCases(currentCaseFilter, search);
+        }
+
+        function openCaseModal(c) {
+            if (typeof c === 'string') c = JSON.parse(c);
+            document.getElementById('modal-title').textContent = c.title;
+            document.getElementById('modal-body').innerHTML = `
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                    <span class="case-tag ${c.cat}">${getCatLabel(c.cat)}</span>
+                    ${c.tags.map(t=>`<span class="case-tag">${t}</span>`).join('')}
+                </div>
+                <h4>📋 案件概述</h4><p>${c.summary}</p>
+                <h4>⚖️ 裁判结果</h4><p>${c.result}</p>
+                <h4>📚 法律依据</h4><div class="law-ref">${c.law}</div>
+                <h4>💡 案例启示</h4><p>及时收集证据，了解维权渠道，必要时申请法律援助。</p>
+                <div style="margin-top:16px;">
+                    <button class="btn btn-primary" onclick="closeModal();switchPage('qa')">🤖 咨询AI</button>
+                </div>
+            `;
+            document.getElementById('modal-overlay').classList.add('open');
+        }
+
+        // ============================================================
+        //  19. 计算器
+        // ============================================================
+        function calcLawsuitFee(amount) {
+            if (!amount || amount <= 0) return 0;
+            if (amount <= 10000) return Math.max(50, amount * 0.05);
+            if (amount <= 100000) return 500 + (amount - 10000) * 0.04;
+            if (amount <= 200000) return 4100 + (amount - 100000) * 0.03;
+            if (amount <= 500000) return 7100 + (amount - 200000) * 0.02;
+            if (amount <= 1000000) return 13100 + (amount - 500000) * 0.015;
+            return 20600 + (amount - 1000000) * 0.01;
+        }
+
+        function calcLawsuit() {
+            const a = Number(document.getElementById('lawsuit-amount').value);
+            const fee = calcLawsuitFee(a);
+            document.getElementById('lawsuit-result').innerHTML =
+                `<div class="calc-result-num">${fee?fee.toFixed(0):'—'}</div><div class="calc-result-label">应缴诉讼费（元）</div>`;
+        }
+
+        function calcInjury() {
+            const salary = Number(document.getElementById('injury-salary').value);
+            const level = Number(document.getElementById('injury-level').value);
+            if (!salary || !level || level < 1 || level > 10) return;
+            const months = [27, 25, 23, 21, 18, 16, 14, 12, 9, 7][level - 1];
+            const result = salary * months;
+            document.getElementById('injury-result').innerHTML =
+                `<div class="calc-result-num">${result.toFixed(0)}</div><div class="calc-result-label">${level}级伤残（${months}个月工资）</div>`;
+        }
+
+        function calcComp() {
+            const salary = Number(document.getElementById('comp-salary').value);
+            const years = Number(document.getElementById('comp-years').value);
+            const illegal = Number(document.getElementById('comp-illegal').value);
+            if (!salary || !years) return;
+            let n = Math.min(years, 12);
+            const base = salary * n;
+            const result = illegal ? base * 2 : base;
+            const label = illegal ? `违法辞退（2N=${n*2}个月）` : `合法解除（N=${n}个月）`;
+            document.getElementById('comp-result').innerHTML =
+                `<div class="calc-result-num">${result.toFixed(0)}</div><div class="calc-result-label">${label}</div>`;
+        }
+
+        function calcTraffic() {
+            const medical = Number(document.getElementById('traffic-medical').value) || 0;
+            const hospital = Number(document.getElementById('traffic-hospital').value) || 0;
+            const lost = Number(document.getElementById('traffic-lost').value) || 0;
+            const nursing = hospital * 100;
+            const lostIncome = lost * 200;
+            const total = medical + nursing + lostIncome;
+            document.getElementById('traffic-result').innerHTML =
+                `<div class="calc-result-num">${total.toFixed(0)}</div><div class="calc-result-label">医疗${medical}+护理${nursing}+误工${lostIncome}</div>`;
+        }
+
+        function calcInterest() {
+            const p = Number(document.getElementById('interest-principal').value) || 0;
+            const r = Number(document.getElementById('interest-rate').value) || 0;
+            const d = Number(document.getElementById('interest-days').value) || 0;
+            const lprMax = 15.4;
+            const effectiveRate = Math.min(r, lprMax);
+            const interest = p * (effectiveRate / 100) / 365 * d;
+            const note = r > lprMax ? `（上限${lprMax}%）` : '';
+            document.getElementById('interest-result').innerHTML =
+                `<div class="calc-result-num">${interest.toFixed(2)}</div><div class="calc-result-label">应付利息${note}</div>`;
+        }
+
+        function calcLawyer() {
+            const type = document.getElementById('lawyer-type').value;
+            const amount = Number(document.getElementById('lawyer-amount').value) || 0;
+            const ranges = {
+                labor: amount > 50000 ? `${(amount*0.08).toFixed(0)}~${(amount*0.15).toFixed(0)}元` : '3,000~8,000元',
+                divorce: amount > 100000 ? `${(amount*0.05).toFixed(0)}~${(amount*0.10).toFixed(0)}元` : '5,000~15,000元',
+                contract: amount > 50000 ? `${(amount*0.06).toFixed(0)}~${(amount*0.12).toFixed(0)}元` : '5,000~10,000元',
+                traffic: amount > 100000 ? `${(amount*0.08).toFixed(0)}~${(amount*0.15).toFixed(0)}元` : '3,000~10,000元',
+                criminal: '20,000~100,000元+'
+            };
+            document.getElementById('lawyer-result').innerHTML =
+                `<div class="calc-result-num" style="font-size:18px;">${ranges[type]}</div><div class="calc-result-label">律师费参考区间</div>`;
+        }
+
+        // ============================================================
+        //  20. 知识库页面渲染 + 搜索
+        // ============================================================
+        function renderKnowledge(search = '') {
+            const grid = document.getElementById('knowledge-grid');
+            const entries = Object.entries(knowledgeData);
+            let filtered = entries;
+            if (search.trim()) {
+                const s = search.trim().toLowerCase();
+                filtered = entries.filter(([key, val]) =>
+                    val.title.includes(s) || val.content.toLowerCase().includes(s)
+                );
+            }
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);grid-column:1/-1;">没有匹配的知识条目</div>';
+                return;
+            }
+            // 按类别分组显示
+            const categories = {
+                '民法': ['minfa1', 'minfa2'],
+                '劳动法': ['labor1', 'labor2'],
+                '婚姻家庭': ['family1'],
+                '消费者保护': ['consumer1', 'consumer2']
+            };
+            let html = '';
+            for (const [catName, keys] of Object.entries(categories)) {
+                const items = keys.filter(k => filtered.some(([key]) => key === k));
+                if (items.length === 0) continue;
+                html += `<div class="know-category">
+                    <div class="know-cat-title">📖 ${catName}</div>
+                    ${items.map(key => {
+                        const d = knowledgeData[key];
+                        return `<div class="know-item" onclick="openKnowledge('${key}')">
+                            <div class="know-item-title">${d.title}</div>
+                            <div class="know-item-desc">${d.content.replace(/<[^>]*>/g,'').slice(0,60)}...</div>
+                        </div>`;
+                    }).join('')}
+                </div>`;
+            }
+            grid.innerHTML = html;
+        }
+
+        function filterKnowledge() {
+            const search = document.getElementById('knowledgeSearchInput').value;
+            renderKnowledge(search);
+        }
+
+        function openKnowledge(key) {
+            const d = knowledgeData[key];
+            if (!d) return;
+            document.getElementById('modal-title').textContent = d.title;
+            document.getElementById('modal-body').innerHTML = d.content;
+            document.getElementById('modal-overlay').classList.add('open');
+        }
+
+        // ============================================================
+        //  21. Modal
+        // ============================================================
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('open');
+        }
+
+        // ============================================================
+        //  22. 工具函数
+        // ============================================================
+        function numToChinese(num) {
+            const n = parseInt(num);
+            if (!n) return '零';
+            return n + '元整';
+        }
+
+        // ============================================================
+        //  23. 初始化
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化年龄热门问题
+            selectAge('worker', document.querySelector('.age-btn.active'));
+            // 加载聊天历史
+            loadChatHistory();
+            // 渲染问卷第一题
+            renderQuestion();
+            // 渲染案例
+            renderCases('all');
+            // 渲染知识库
+            renderKnowledge();
+            // 计算器初始化
+            calcLawyer();
+            // 设置默认焦点
+            document.getElementById('chat-input').focus();
+        });
+
+        // 键盘快捷键：Ctrl+Enter 发送
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                const active = document.activeElement;
+                if (active && active.id === 'chat-input') {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
